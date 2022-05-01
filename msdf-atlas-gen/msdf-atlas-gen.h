@@ -35,4 +35,5 @@
 #include "artery-font-export.h"
 #include "csv-export.h"
 #include "json-export.h"
+#include "txf-export.h"
 #include "shadron-preview-generator.h"
