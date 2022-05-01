@@ -126,6 +126,8 @@ R"(
 R"(
   -shadronpreview <filename.shadron> <sample text>
       Generates a Shadron script that uses the generated atlas to draw a sample text as a preview.
+  -txf <basename.txf>
+      Writes the layout data of the glyphs into one or more binary TXF files.
 
 GLYPH CONFIGURATION
   -size <em size>
@@ -325,6 +327,7 @@ struct Configuration {
     const char *imageFilename;
     const char *jsonFilename;
     const char *csvFilename;
+    const char *txfFilename;
     const char *shadronPreviewFilename;
     const char *shadronPreviewText;
 };
@@ -556,6 +559,10 @@ int main(int argc, const char *const *argv) {
         }
         ARG_CASE("-csv", 1) {
             config.csvFilename = argv[argPos++];
+            continue;
+        }
+        ARG_CASE("-txf", 1) {
+            config.txfFilename = argv[argPos++];
             continue;
         }
         ARG_CASE("-shadronpreview", 2) {
@@ -935,7 +942,7 @@ int main(int argc, const char *const *argv) {
     }
     if (!fontInput.fontFilename)
         ABORT("No font specified.");
-    if (!(config.arteryFontFilename || config.imageFilename || config.jsonFilename || config.csvFilename || config.shadronPreviewFilename)) {
+    if (!(config.arteryFontFilename || config.imageFilename || config.jsonFilename || config.csvFilename || config.txfFilename || config.shadronPreviewFilename)) {
         fputs("No output specified.\n", stderr);
         return 0;
     }
@@ -1034,7 +1041,7 @@ int main(int argc, const char *const *argv) {
         result = 1;
         fputs("Error: Unable to create an Artery Font file with the specified image format!\n", stderr);
         // Recheck whether there is anything else to do
-        if (!(config.arteryFontFilename || config.imageFilename || config.jsonFilename || config.csvFilename || config.shadronPreviewFilename))
+        if (!(config.arteryFontFilename || config.imageFilename || config.jsonFilename || config.csvFilename || config.txfFilename || config.shadronPreviewFilename))
             return result;
         layoutOnly = !(config.arteryFontFilename || config.imageFilename);
     }
@@ -1419,6 +1426,14 @@ int main(int argc, const char *const *argv) {
         else {
             result = 1;
             fputs("Failed to write JSON output file.\n", stderr);
+        }
+    }
+    if (config.txfFilename) {
+        if (exportTXF(fonts.data(), fonts.size(), config.emSize, config.pxRange, config.width, config.height, config.yDirection, config.txfFilename, config.kerning))
+            puts("Glyph layout written into TXF file.");
+        else {
+            result = 1;
+            puts("Failed to write TXF output file.");
         }
     }
 
