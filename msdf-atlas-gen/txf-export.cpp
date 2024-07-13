@@ -45,7 +45,7 @@ static void txf_setKernIndex(TxfGlyph* gbuf, int count, uint16_t code,
 }
 
 bool exportTXF(const FontGeometry *fonts, int fontCount,
-               double fontSize, double pixelRange,
+               double fontSize, const msdfgen::Range& pixelRange,
                int atlasWidth, int atlasHeight, YDirection yDirection,
                const char *filename, bool kerning) {
     TxfHeader hdr;
@@ -83,7 +83,7 @@ bool exportTXF(const FontGeometry *fonts, int fontCount,
         hdr.glyphCount  = 0;
         hdr.kernOffset  = 0;
         hdr.fontSize    = fontSize;
-        hdr.pixelRange  = pixelRange;
+        hdr.pixelRange  = pixelRange.upper - pixelRange.lower;
         hdr.lineHeight  = metrics.lineHeight;
         hdr.ascender    = metrics.ascenderY;
         hdr.descender   = metrics.descenderY;
